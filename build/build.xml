@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     Jan 02, 2012 20:10:00 PM                                                        
+
+     mysite - Static site generator
+                   
+     @author sangupta                                                                
+     ====================================================================== -->
+<project name="mysite" default="default" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+
+	<!-- project description -->
+	<description>
+            Static site generator.
+    </description>
+	
+	<!-- read the properties file -->
+	<property file="build.properties" />
+
+	<!-- Create a time stamp -->
+	<tstamp>
+		<format property="BUILD.TIME" pattern="yyyy/MM/dd:HH:mm:ss" />
+	</tstamp>
+
+	<!-- The default classpath -->
+	<path id="classpath">
+        <fileset dir="${project.dependencies.folder}" includes="**/*.jar"/>
+    </path>
+
+	<!-- ================================= 
+          target: default
+          description: the most applicable target to build the mysite project.              
+         ================================= -->
+	<target name="default" depends="downloadDependencies,build" description="Build the entire project using default configuraiton">
+
+	</target>
+	
+	<!-- ================================= 
+          target: build
+          description: compile the source code and generate the packaged JARs              
+         ================================= -->
+	<target name="build" description="compile the source code and generate the two packaged JARs">
+		<!-- clean stage folder -->
+		<delete dir="${stage.folder}" />
+		<mkdir dir="${stage.folder}" />
+
+		<!-- update the build number -->
+		<buildnumber file="build.number" />
+
+		<!-- compile sources -->
+		<javac srcdir="${src.folder}" destdir="${stage.folder}" debug="false" optimize="true" classpathref="classpath" />
+
+		<!-- package -->
+		<jar destfile="${releases.folder}/${project.name}-${version.number}-b${build.number}.jar">
+			<fileset dir="${stage.folder}" />
+			<manifest>
+				<attribute name="Product-Name" value="${project.name}" />
+				<attribute name="Product-Version" value="${version.number}" />
+				<attribute name="Product-Description" value="${project.description}" />
+				<attribute name="Build-Number" value="${build.number}" />
+				<attribute name="Build-Date" value="${BUILD.TIME}" />
+				<attribute name="Main-Class" value="${main.class}" />
+				<attribute name="Author" value="${project.author}" />
+				<attribute name="Project-Home" value="${project.home}" />
+				<attribute name="Author-Home" value="${author.home}" />
+			</manifest>
+		</jar>
+
+		<pathconvert property="mf.classpath" pathsep=" ">
+	        <path refid="classpath"/>
+	        <mapper>
+                <chainedmapper>
+                    <flattenmapper/>
+                    <globmapper from="*.jar" to="*.jar"/>
+                </chainedmapper>
+	        </mapper>
+		</pathconvert>
+		
+		<!-- package an all-inclusive jar too -->
+		<jar destfile="${releases.folder}/${project.name}-nodeps-${version.number}-b${build.number}.jar" filesetmanifest="skip">
+            <manifest>
+				<attribute name="Product-Name" value="${project.name}" />
+				<attribute name="Product-Version" value="${version.number}" />
+				<attribute name="Product-Description" value="${project.description}" />
+				<attribute name="Build-Number" value="${build.number}" />
+				<attribute name="Build-Date" value="${BUILD.TIME}" />
+				<attribute name="Main-Class" value="${main.class}" />
+				<attribute name="Author" value="${project.author}" />
+				<attribute name="Project-Home" value="${project.home}" />
+				<attribute name="Author-Home" value="${author.home}" />
+            </manifest>
+			<fileset dir="${stage.folder}" />
+            <zipgroupfileset dir="${project.dependencies.folder}" includes="**/*.jar" />
+        </jar>
+
+		<!-- clean stage -->
+		<delete dir="${stage.folder}" />
+	</target>
+	
+	<!-- ================================= 
+          target: downloadMavenAntTask
+          description: Download the Maven's ANT task for build process
+         ================================= -->
+	<target name="downloadMavenAntTask" description="Download the Maven's ANT task for build process" >
+		<mkdir dir="${root.folder}/build/lib" />
+		<get dest="${root.folder}/build/lib" src="http://www.apache.org/dist//maven/binaries/${maven.ant.jar}" usetimestamp="true" />
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: downloadDependencies                      
+          description: downloads project dependencies from the Maven repository 
+         - - - - - - - - - - - - - - - - - -->
+	<target name="downloadDependencies" description="downloads project dependencies from the Maven repository">
+		<!-- defined MAVEN ANT TASKS -->
+		<path id="maven-ant-tasks.classpath" path="lib/${maven.ant.jar}" />
+		<typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="antlib:org.apache.maven.artifact.ant" classpathref="maven-ant-tasks.classpath" />
+
+		<!-- download all given dependencies -->
+		<artifact:dependencies filesetId="dependency.fileset" useScope="runtime">
+			<!-- XStream -->
+			<dependency groupId="com.thoughtworks.xstream" artifactId="xstream" version="1.4.2" />
+
+			<!-- logging support -->
+			<dependency groupId="commons-logging" artifactId="commons-logging" version="1.1.1" />
+			<dependency groupId="log4j" artifactId="log4j" version="1.2.16" />
+			
+			<!-- commons io -->
+			<dependency groupId="commons-io" artifactId="commons-io" version="2.1" />
+			
+			<!-- jericho html parser -->
+			<dependency groupId="net.htmlparser.jericho" artifactId="jericho-html" version="3.2" />
+			
+			<!-- apache velocity -->
+			<dependency groupId="org.apache.velocity" artifactId="velocity" version="1.7" />
+		</artifact:dependencies>
+
+		<!-- Copy all artifacts to the local dependencies store -->
+		<copy todir="${project.dependencies.folder}">
+			<fileset refid="dependency.fileset" />
+			
+			<!-- This mapper strips off all leading directory information -->
+			<mapper type="flatten" />
+		</copy>
+	</target>
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: clearMavenCache                      
+          description: clears the local maven cache so files are freshly fetched from servers 
+         - - - - - - - - - - - - - - - - - -->
+	<target name="clearMavenCache" description="clears the local maven cache so files are freshly fetched from servers">
+		<delete dir="${user.home}/.m2" />
+	</target>
+
+</project>
