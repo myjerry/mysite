@@ -60,7 +60,15 @@ public class AssetsProcessor {
 				for(File file : files) {
 					try {
 						String path = file.getAbsolutePath();
-						path = path.substring(rootPath.length());
+
+						if(asset.getTo() != null) {
+							String removal = rootPath + File.separator + asset.getFolder();
+							path = path.substring(removal.length());
+							
+							path = asset.getTo() + File.separator + path;
+						} else {
+							path = path.substring(rootPath.length());
+						}
 						
 						byte[] bytes = FileUtils.readFileToByteArray(file);
 						projectFiles.add(new ProjectFile(path, bytes));

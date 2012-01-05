@@ -37,6 +37,9 @@ public class Asset {
 	@XStreamAsAttribute
 	private String file;
 	
+	@XStreamAsAttribute
+	private String to;
+	
 	public boolean isFolder() {
 		return StringUtils.isNotEmpty(this.folder);
 	}
@@ -61,6 +64,14 @@ public class Asset {
 
 	public void setFile(String file) {
 		this.file = file;
+	}
+
+	public String getTo() {
+		return to;
+	}
+
+	public void setTo(String to) {
+		this.to = to;
 	}
 
 }
