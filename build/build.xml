@@ -48,6 +48,11 @@
 
 		<!-- compile sources -->
 		<javac srcdir="${src.folder}" destdir="${stage.folder}" debug="false" optimize="true" classpathref="classpath" />
+		
+		<!-- copy all resources to stage from sources folder -->
+		<copy todir="${stage.folder}">
+			<fileset dir="${src.folder}" excludes="**/*.java" />
+		</copy>
 
 		<!-- package -->
 		<jar destfile="${releases.folder}/${project.name}-${version.number}-b${build.number}.jar">

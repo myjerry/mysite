@@ -70,5 +70,35 @@ public class MySiteAntTask extends Task {
 		
 		return false;
 	}
+	
+	// Usual accessors follow
+
+	/**
+	 * @return the projectXML
+	 */
+	public String getProjectXML() {
+		return projectXML;
+	}
+
+	/**
+	 * @param projectXML the projectXML to set
+	 */
+	public void setProjectXML(String projectXML) {
+		this.projectXML = projectXML;
+	}
+
+	/**
+	 * @return the outputFolder
+	 */
+	public String getOutputFolder() {
+		return outputFolder;
+	}
+
+	/**
+	 * @param outputFolder the outputFolder to set
+	 */
+	public void setOutputFolder(String outputFolder) {
+		this.outputFolder = outputFolder;
+	}
 
 }
