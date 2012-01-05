@@ -131,6 +131,9 @@
 			
 			<!-- apache velocity -->
 			<dependency groupId="org.apache.velocity" artifactId="velocity" version="1.7" />
+			
+			<!-- apache ant -->
+			<dependency groupId="org.apache.ant" artifactId="ant" version="1.8.2" />
 		</artifact:dependencies>
 
 		<!-- Copy all artifacts to the local dependencies store -->
